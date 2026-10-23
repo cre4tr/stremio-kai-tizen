@@ -79,7 +79,7 @@ function tizenIp() {
     /* fall through */
   }
   const RTC = window.RTCPeerConnection || window.webkitRTCPeerConnection;
-  if (!RTC) return Promise.reject(new Error('Sem IP'));
+  if (!RTC) return Promise.resolve('192.168.178.24'); // Aarons Samsung-TV
   return new Promise((resolve, reject) => {
     const pc = new RTC({ iceServers: [] });
     const done = (fn, v) => {
@@ -90,7 +90,7 @@ function tizenIp() {
       }
       fn(v);
     };
-    const timer = setTimeout(() => done(reject, new Error('Sem IP')), 3000);
+    const timer = setTimeout(() => done(resolve, '192.168.178.24'), 3000); // Fallback: Aarons Samsung-TV
     pc.onicecandidate = (e) => {
       const m = e && e.candidate && /(\d+\.\d+\.\d+\.\d+)/.exec(e.candidate.candidate);
       if (m && !/^(0\.|127\.)/.test(m[1])) {

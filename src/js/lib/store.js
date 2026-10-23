@@ -118,7 +118,7 @@ const DEVICE_KEYS = ['serverUrl', 'tmdbKey', 'mdblistKey', 'smoothScroll', 'devl
 
 const DEFAULT_SETTINGS = {
   // TV
-  serverUrl: '',
+  serverUrl: '192.168.178.32', // Aarons Mac mini, fest eingetragen (Samsung-Tastatur verschluckt Eingaben)
   tmdbKey: typeof __KAI_TMDB__ !== 'undefined' ? __KAI_TMDB__ : '',
   mdblistKey: typeof __KAI_MDBLIST__ !== 'undefined' ? __KAI_MDBLIST__ : '',
   smoothScroll: false, // rolagem animada (mais bonita, mais pesada na TV)
@@ -145,7 +145,9 @@ const DEFAULT_SETTINGS = {
 export function settings() {
   // Legenda automática padrão segue o idioma do app (quem já escolheu, mantém a escolha).
   const base = Object.assign({}, DEFAULT_SETTINGS, current() === 'en' ? { subtitleLangs: ['eng', 'en'] } : null);
-  return Object.assign(base, rawGet('device', {}), get('settings', {}));
+  const merged = Object.assign(base, rawGet('device', {}), get('settings', {}));
+  if (!/\d+\.\d+\.\d+\.\d+|\w+\.\w+/.test(merged.serverUrl || '')) merged.serverUrl = '192.168.178.32';
+  return merged;
 }
 
 export function saveSettings(patch) {

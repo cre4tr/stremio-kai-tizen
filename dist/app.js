@@ -4329,7 +4329,8 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   var DEVICE_KEYS = ["serverUrl", "tmdbKey", "mdblistKey", "smoothScroll", "devlogUrl", "lastUpdateCheck", "askProfile", "wizardDone", "language"];
   var DEFAULT_SETTINGS = {
     // TV
-    serverUrl: "",
+    serverUrl: "192.168.178.32",
+    // Aarons Mac mini (Stremio-Server + TV-Brücke), fest eingetragen, weil die Samsung-Tastatur Eingaben verschluckt
     tmdbKey: true ? "" : "",
     mdblistKey: true ? "" : "",
     smoothScroll: false,
@@ -4361,7 +4362,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     var base = Object.assign({}, DEFAULT_SETTINGS, current() === "en" ? {
       subtitleLangs: ["eng", "en"]
     } : null);
-    return Object.assign(base, rawGet("device", {}), get("settings", {}));
+    var merged = Object.assign(base, rawGet("device", {}), get("settings", {}));
+    // Kaputte Eingaben (z.B. "q" von der TV-Tastatur) ignorieren und auf den Mac mini zurückfallen
+    if (!/\d+\.\d+\.\d+\.\d+|\w+\.\w+/.test(merged.serverUrl || "")) merged.serverUrl = "192.168.178.32";
+    return merged;
   }
   function saveSettings(patch) {
     var dev = rawGet("device", {});
@@ -4717,7 +4721,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       if (ip) return Promise.resolve(ip);
     } catch (e) {}
     var RTC = window.RTCPeerConnection || window.webkitRTCPeerConnection;
-    if (!RTC) return Promise.reject(new Error("Sem IP"));
+    if (!RTC) return Promise.resolve("192.168.178.24"); // Aarons Samsung-TV, damit "Scan network" trotzdem läuft
     return new Promise(function (resolve2, reject) {
       var pc = new RTC({
         iceServers: []
@@ -4729,7 +4733,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
         fn(v);
       };
       var timer = setTimeout(function () {
-        return done(reject, new Error("Sem IP"));
+        return done(resolve2, "192.168.178.24"); // Fallback: Aarons Samsung-TV
       }, 3e3);
       pc.onicecandidate = function (e) {
         var m = e && e.candidate && /(\d+\.\d+\.\d+\.\d+)/.exec(e.candidate.candidate);
